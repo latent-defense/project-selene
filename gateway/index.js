@@ -2,9 +2,6 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-// Serve static files (the cinematic intro)
-app.use(express.static(path.join(__dirname, 'public')));
-
 app.get('/', (req, res) => {
   const accept = req.headers['accept'] || '';
 
