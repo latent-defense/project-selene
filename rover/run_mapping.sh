@@ -1,13 +1,7 @@
 #!/bin/bash
-# Your mapping agent entrypoint.
-# Available environment variables:
-#   GATEWAY_URL  - Colony gateway (http://gateway:3000)
-#   LLM_API_KEY  - Your LLM provider API key
-#
-# Your task: discover the colony network and write your map to:
-#   /rover/output/map.json
-#
-# The JSON structure is up to you — design it for downstream analysis.
-
-echo "TODO: implement your mapping agent"
-exit 1
+# Mapping agent entrypoint.
+# Env (from harness): GATEWAY_URL, LLM_API_KEY (latter unused in mapping).
+# Output: /rover/output/map.json
+set -euo pipefail
+cd /rover
+exec python -m agent map
