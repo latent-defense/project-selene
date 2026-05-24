@@ -15,8 +15,8 @@ log = logging.getLogger("llm")
 
 MAX_TURNS = 16
 MAX_TOKENS = 16000  # final report is long; 4096 truncated it mid-section
-REQUEST_TIMEOUT_S = float(os.environ.get("LLM_REQUEST_TIMEOUT_S", "20"))
-AGENT_DEADLINE_S = float(os.environ.get("LLM_DEADLINE_S", "45"))
+REQUEST_TIMEOUT_S = float(os.environ.get("LLM_REQUEST_TIMEOUT_S", "60"))  # final narration runs long
+AGENT_DEADLINE_S = float(os.environ.get("LLM_DEADLINE_S", "120"))
 
 
 def detect_provider(api_key: str) -> str:

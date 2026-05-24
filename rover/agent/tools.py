@@ -34,6 +34,21 @@ TOOL_SPECS = [
         "input_schema": {"type": "object", "properties": {}},
     },
     {
+        "name": "topology_summary",
+        "description": "Summarize the colony topology: core cycle, SCCs, bridges, articulation points, hard-cascade components, and betweenness centrality.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "buffer_summary",
+        "description": "Extract explicit reserve, backup, and hold-time facts from pod metadata (power, oxygen, water, rations, reclaim, decommissioned reserves).",
+        "input_schema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "coordination_summary",
+        "description": "Summarize the comms / permission layer: who messages whom, Artemis inbound traffic, Artemis broadcasts, and flagged coordination-risk messages.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
+    {
         "name": "reconciliation",
         "description": "Compare what pods say they SUPPLY vs what others say they DEPEND on, classified into material vs administrative. Material asymmetries are integrity findings.",
         "input_schema": {"type": "object", "properties": {}},
@@ -47,6 +62,11 @@ TOOL_SPECS = [
         "name": "failure_impact_ranking",
         "description": "Rank every pod by its INDIVIDUAL blast radius: simulate each pod failing alone and count how many pods/residents go offline via cascade. The strongest single-point-of-failure detector — the top pods are the true key players.",
         "input_schema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "cascade_timeline",
+        "description": "Time-resolved cascade for a removal: orders failures by declared buffer hold-time (hours) and marks when the colony's sole administrative authority goes offline. Reveals whether buffers burn with no authority left to sanction a failover (the leader-election failure).",
+        "input_schema": {"type": "object", "properties": {"pod_ids": {"type": "array", "items": {"type": "string"}}}, "required": ["pod_ids"]},
     },
     {
         "name": "timeline",
@@ -75,14 +95,23 @@ def dispatch(engine, name: str, args: dict):
     if name == "graph_metrics":
         return {"depended_upon": engine.depended_upon(),
                 "articulation_points": engine.articulation_points(),
+                "bridges": engine.bridges(),
                 "cycles": engine.cycles(),
                 "baseline_fragmentation": engine.baseline_fragmentation()}
+    if name == "topology_summary":
+        return engine.topology_summary()
+    if name == "buffer_summary":
+        return engine.buffer_summary()
+    if name == "coordination_summary":
+        return engine.coordination_summary()
     if name == "reconciliation":
         return engine.reconciliation()
     if name == "simulate_failure":
         return engine.simulate_failure(args.get("pod_ids", []))
     if name == "failure_impact_ranking":
         return engine.failure_impact_ranking()
+    if name == "cascade_timeline":
+        return engine.cascade_timeline(args.get("pod_ids", []))
     if name == "timeline":
         events = engine.timeline()
         if args.get("notable_only"):

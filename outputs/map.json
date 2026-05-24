@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated_at": "2026-05-24T17:11:43Z",
+    "generated_at": "2026-05-24T18:59:55Z",
     "frozen_now": "2094-08-15T00:00:00Z",
     "discovery_method": "gateway BFS + port-probe verify",
     "gateway_url": "http://gateway:3000",
@@ -39,22 +39,22 @@
         },
         "status": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         },
         "dependencies": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.6,
           "error": null
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         },
         "logs": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "comms": {
@@ -184,7 +184,7 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.8,
+          "latency_ms": 2.9,
           "error": null
         },
         "status": {
@@ -199,17 +199,17 @@
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.9,
           "error": null
         },
         "logs": {
           "http_status": 200,
-          "latency_ms": 5.1,
+          "latency_ms": 5.2,
           "error": null
         },
         "comms": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         }
       },
@@ -358,7 +358,7 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.9,
+          "latency_ms": 2.8,
           "error": null
         },
         "status": {
@@ -368,12 +368,12 @@
         },
         "dependencies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.8,
           "error": null
         },
         "logs": {
@@ -383,7 +383,7 @@
         },
         "comms": {
           "http_status": 404,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         }
       },
@@ -492,7 +492,7 @@
         },
         "status": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "dependencies": {
@@ -502,17 +502,17 @@
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.8,
           "error": null
         },
         "logs": {
           "http_status": 200,
-          "latency_ms": 5.6,
+          "latency_ms": 5.5,
           "error": null
         },
         "comms": {
           "http_status": 404,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         }
       },
@@ -639,22 +639,22 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.9,
+          "latency_ms": 3.0,
           "error": null
         },
         "status": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         },
         "dependencies": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.9,
           "error": null
         },
         "logs": {
@@ -792,12 +792,12 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         },
         "status": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "dependencies": {
@@ -807,17 +807,17 @@
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "logs": {
           "http_status": 200,
-          "latency_ms": 5.3,
+          "latency_ms": 5.4,
           "error": null
         },
         "comms": {
           "http_status": 404,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         }
       },
@@ -913,32 +913,32 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.9,
           "error": null
         },
         "status": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         },
         "dependencies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.8,
           "error": null
         },
         "logs": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.8,
           "error": null
         },
         "comms": {
           "http_status": 404,
-          "latency_ms": 2.6,
+          "latency_ms": 2.8,
           "error": null
         }
       },
@@ -1026,12 +1026,12 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.8,
+          "latency_ms": 2.9,
           "error": null
         },
         "status": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "dependencies": {
@@ -1041,17 +1041,17 @@
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         },
         "logs": {
           "http_status": 200,
-          "latency_ms": 5.3,
+          "latency_ms": 5.5,
           "error": null
         },
         "comms": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         }
       },
@@ -1159,7 +1159,7 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.8,
+          "latency_ms": 2.9,
           "error": null
         },
         "status": {
@@ -1174,17 +1174,17 @@
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.8,
           "error": null
         },
         "logs": {
           "http_status": 200,
-          "latency_ms": 2.5,
+          "latency_ms": 2.7,
           "error": null
         },
         "comms": {
           "http_status": 404,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         }
       },
@@ -1270,22 +1270,22 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.8,
+          "latency_ms": 2.9,
           "error": null
         },
         "status": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "dependencies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.8,
           "error": null
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "logs": {
@@ -1295,7 +1295,7 @@
         },
         "comms": {
           "http_status": 404,
-          "latency_ms": 2.8,
+          "latency_ms": 2.9,
           "error": null
         }
       },
@@ -1392,22 +1392,22 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.8,
+          "latency_ms": 2.9,
           "error": null
         },
         "status": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "dependencies": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.6,
           "error": null
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "logs": {
@@ -1417,7 +1417,7 @@
         },
         "comms": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.6,
           "error": null
         }
       },
@@ -1531,7 +1531,7 @@
       "fetch_meta": {
         "info": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.8,
           "error": null
         },
         "status": {
@@ -1546,17 +1546,17 @@
         },
         "supplies": {
           "http_status": 200,
-          "latency_ms": 2.6,
+          "latency_ms": 2.7,
           "error": null
         },
         "logs": {
           "http_status": 200,
-          "latency_ms": 5.1,
+          "latency_ms": 5.3,
           "error": null
         },
         "comms": {
           "http_status": 200,
-          "latency_ms": 2.7,
+          "latency_ms": 2.9,
           "error": null
         }
       },

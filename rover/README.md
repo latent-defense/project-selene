@@ -3,19 +3,20 @@
 > **Submission — Kojin Glick (`kojin-glick-report` branch).** This branch implements the
 > mapping + reporting agents and adds an analysis write-up and a companion dashboard.
 >
-> - **Write-up:** [`../KOJIN_WRITE_UP.md`](../KOJIN_WRITE_UP.md) — start here. Covers the two
->   decisions that matter: (1) why Borgatti's *key player* framing, since in-degree misses
->   Terminus's true criticality; (2) keeping all graph resolution **deterministic** so the
->   LLM agent *ferries* verifiable measures rather than inventing them.
+> - **Write-up:** [`../KOJIN_WRITE_UP.md`](../KOJIN_WRITE_UP.md) — start here. The current
+>   argument is that Selene is doubly centralized: destructive criticality is concentrated
+>   in the `aquifer-helios-terminus` material core, while constructive response is routed
+>   through Artemis. Buffers are treated as countdown timers, not redundancy.
 > - **Agent code:** [`agent/`](agent/) — `discovery` → `mapping` → `engine` (deterministic
->   metrics) → `tools` (progressive disclosure) → `llm` → `reporting`. Entrypoints:
+>   topology, cascade, reconciliation, buffer, and coordination analysis) → `tools`
+>   (progressive disclosure) → `llm` → `reporting`. Entrypoints:
 >   [`run_mapping.sh`](run_mapping.sh), [`run_reporting.sh`](run_reporting.sh).
 > - **Produced outputs:** [`../outputs/map.json`](../outputs/map.json),
 >   [`../outputs/report.md`](../outputs/report.md).
 > - **Dashboard (separate, read-only, does not touch this stack):**
->   https://github.com/moonstripe/selene-colony-monitor — live SSE monitor, dependency
->   graph, key-player highlight, node-detail, failure injection, and a chat that streams
->   the agent's tool-use loop.
+>   https://github.com/moonstripe/selene-colony-monitor — live rover monitor, material /
+>   cascade / coordination graph views, deterministic topology brief, failure injection,
+>   rendered report, and an agentic chat that streams the rover tool loop.
 >
 > **Run:**
 > ```bash
