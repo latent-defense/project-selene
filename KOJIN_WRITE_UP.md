@@ -3,6 +3,7 @@
 ## Executive Summary
 
 - **The colony is doubly centralized.** Material failure is concentrated in the `aquifer-helios-terminus` core. Operational response is concentrated in `Artemis`. Any one core failure takes **9 of 12 pods and 109 of 130 residents** offline. The remaining safety margin is mostly just local buffers: Zephyr `4h`, Medica `6h`, Aquifer `~2.9d`.
+- **Phase 3, as-is, fails on water (high confidence).** Aquifer is at **93% of rated capacity** with no backup; expansion exhausts it, and the same core failure removes the authority to ration. It becomes viable only if water capacity, redundancy, and failure-authority are provisioned ahead of the population — see recommendations.
 - **Mapping is deterministic.** The rover discovers the colony from the gateway, resolves all pods, crawls every endpoint, and writes a raw `map.json`. No LLM is involved.
 - **Reporting is deterministic-first.** The engine computes topology, cascade, reconciliation, buffers, and comms summaries; the LLM only investigates through tools and explains those results.
 
@@ -39,9 +40,34 @@ The LLM is useful here as an analyst interface, not as an analyst substrate. It 
 - The **engine** owns every measurement: SCCs, articulation points, hard-cascade components, blast radius, supply/dependency mismatches, buffer facts, and comms / coordination summaries.
 - The **agent** owns selection and narration only. It calls tools like `failure_impact_ranking`, `topology_summary`, `buffer_summary`, `coordination_summary`, `reconciliation`, and targeted pod/log/comms accessors. It does not compute the facts it reports.
 
-That split matters for reliability too. Mapping is deterministic by design. Reporting is deadline-bounded: if the model stalls, the rover emits a deterministic fallback report rather than hanging in `202 Accepted`. The fallback is blunter than the narrated report, but it preserves the actual analytical spine of the submission.
+That split also buys reliability — mapping is deterministic, and reporting is deadline-bounded with a deterministic fallback rather than a hung `202`. But the deeper reason to put the world model in code is what it makes possible next.
 
-In other words: the validated colony model lives in code. The model can phrase the case; it does not get to invent the case.
+The engine does more than measure the present; it *synthesizes* the colony's state under intervention. `simulate_failure`, `cascade_timeline`, and `failure_impact_ranking` each take a hypothetical — remove these pods — and return the exact, reproducible state it leads to. That makes it a verifier, not just a measurement: for any action you can name, it produces the ground truth of what follows. World-model building runs on exactly this — a model that learns to predict consequences is only as trustworthy as the verifier behind it. Without one you get fluent claims checked after the fact (the "109 of 147" slip is what that costs); build the verifier first and the predictions on top of it stay checkable, with unlimited exact targets to train against.
+
+So the code-first world model is a foundation, not a fence: get the verifier right and planning, what-if, and counterfactual reasoning become operations the engine can settle, rather than claims a narrator must be trusted not to fabricate. For now the model phrases the case; the same substrate is what would later let it predict one.
+
+---
+
+## Phase 3 — assessment
+
+**We assess with high confidence that Phase 3, executed against the current infrastructure, fails catastrophically through water exhaustion.** The mechanism is not speculative; it is fixed by the colony's own numbers.
+
+Water is a single source running at the edge. Aquifer operates at **42,000 of 45,000 L/day — 93% of rated capacity, 3,000 L/day of headroom** — and that one source feeds residents, Hydroponics' food production, Zephyr's entire atmospheric-moisture budget, and Prometheus' synthesis draw. Population has already climbed 100→147; a further rise of roughly 7% — a fraction of what has already been absorbed — exhausts rated output. Past that point throughput cannot climb, the deficit is drawn from the reservoir, and the 2.86-day cover runs down. There is no fallback: Vault's `water_backup` was decommissioned (Dir. 2093-089) and Aquifer reports `backup_systems = 0`.
+
+The failure is also fast and unattended. Water sits inside the Aquifer–Helios–Terminus core, so the same event that interrupts supply removes Artemis at **T+0** — the only node that could authorize rationing or reallocation. The colony would face a draining reservoir with no standing authority to manage it, inside buffer windows (Zephyr 4 h, Medica 6 h) that are themselves shrinking as load grows. Operators have already signaled the approach: Hydroponics flagged that Prometheus draws 15% of its allocation and that "if Aquifer throughput dips we'd both feel it same day," and the warning was routed to a planning cycle.
+
+**Bottom line:** under the current structure Phase 3 does not add risk at the margin — it converts a survivable-in-principle fragility into a water-exhaustion failure with no operator in the loop.
+
+### Recommendations — how Phase 3 succeeds
+
+Phase 3 is achievable, but only if water capacity, redundancy, and failure-authority are provisioned *ahead of* the population they serve. In priority order:
+
+1. **Size water capacity to the Phase 3 headcount, not today's.** Raise Aquifer throughput (or add a second source) to the *target* population's draw plus a real margin, so headroom grows with the colony instead of vanishing on arrival.
+2. **Restore a water backup.** Reverse directive 2093-089 and Aquifer's `backup_systems = 0` so a supply dip has a fallback instead of silently eating the reservoir's 2.86-day cover.
+3. **Break the Aquifer–Helios–Terminus cycle.** Give Aquifer's pumps an independent power feed so a power or mining fault cannot take the water core down with it — water must survive the failures around it.
+4. **Pre-delegate water-rationing authority to survive a core outage.** Because Artemis goes offline at T+0 with the core, a node other than Artemis must already hold standing authority to ration and reallocate water the moment supply drops.
+
+Sequence these and the growth the colony wants becomes growth its infrastructure can carry: **provision water before people, and the rest of the buildout is downstream of that one sequence.**
 
 ---
 
@@ -68,7 +94,7 @@ In other words: the validated colony model lives in code. The model can phrase t
 - **The reserve story runs in one direction.** Across 2093–2094, Selene removed slack: Vault water backup, Vault coolant distribution, and Zephyr humidity reclaim. The result is not lean resilience; it is reduced recovery time.
 - **Artemis is the coordination choke point — and a casualty of the failure it should coordinate.** It is the sole administrative authority with no succession, and it depends on the core at high criticality. The time-resolved cascade puts it offline at `T+0h` in every core scenario, opening a `6h` window in which Zephyr's `4h` and Medica's `6h` buffers expire with no one able to authorize a failover.
 - **The failover reserves were already spent.** Vault's `water_backup` and `coolant_distribution` — the exact paths that would cover an Aquifer or Helios loss — were decommissioned by Artemis directives 2093-089 and 2094-011. The buffers that remain are countdown timers, not redundancy.
-- **Phase 3 is the wrong next move unless the structure changes first.** Expansion increases load on exactly the parts of the colony that are already over-coupled.
+- **Phase 3's critical path is water.** Aquifer is at `93%` of rated capacity (`42,000/45,000 L/day`), population has already grown `100→147`, and buffers are rate-denominated — so the expansion succeeds exactly to the degree that water capacity, water redundancy, and water-failure authority are provisioned ahead of the people they serve.
 
 ---
 
