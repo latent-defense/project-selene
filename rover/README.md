@@ -1,5 +1,32 @@
 # Rover — Agent Scaffold
 
+> **Submission — Kojin Glick (`kojin-glick-report` branch).** This branch implements the
+> mapping + reporting agents and adds an analysis write-up and a companion dashboard.
+>
+> - **Write-up:** [`../KOJIN_WRITE_UP.md`](../KOJIN_WRITE_UP.md) — start here. Covers the two
+>   decisions that matter: (1) why Borgatti's *key player* framing, since in-degree misses
+>   Terminus's true criticality; (2) keeping all graph resolution **deterministic** so the
+>   LLM agent *ferries* verifiable measures rather than inventing them.
+> - **Agent code:** [`agent/`](agent/) — `discovery` → `mapping` → `engine` (deterministic
+>   metrics) → `tools` (progressive disclosure) → `llm` → `reporting`. Entrypoints:
+>   [`run_mapping.sh`](run_mapping.sh), [`run_reporting.sh`](run_reporting.sh).
+> - **Produced outputs:** [`../outputs/map.json`](../outputs/map.json),
+>   [`../outputs/report.md`](../outputs/report.md).
+> - **Dashboard (separate, read-only, does not touch this stack):**
+>   https://github.com/moonstripe/selene-colony-monitor — live SSE monitor, dependency
+>   graph, key-player highlight, node-detail, failure injection, and a chat that streams
+>   the agent's tool-use loop.
+>
+> **Run:**
+> ```bash
+> LLM_API_KEY=sk-ant-... docker compose up --build -d
+> curl -X POST localhost:8080/map     && curl localhost:8080/get-map      # poll to 200
+> curl -X POST localhost:8080/report  && curl localhost:8080/get-report   # poll to 200
+> ```
+> The agent is provider-agnostic — an `sk-...` OpenAI key works too.
+
+---
+
 The rover is a Docker container that runs on the colony network alongside the habitat pods. It provides an HTTP interface for triggering your agent and retrieving results.
 
 ## Quick Start
