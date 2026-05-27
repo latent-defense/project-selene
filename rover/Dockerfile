@@ -8,6 +8,7 @@ EXPOSE 8080
 FROM base
 
 # --- Install your dependencies below ---
+RUN pip install --no-cache-dir anthropic httpx
 # Example: RUN pip install anthropic httpx networkx
 # Example: RUN npm install -g tsx && npm install openai
 
