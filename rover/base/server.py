@@ -33,7 +33,10 @@ def _start_job(name: str):
         if proc and proc.poll() is None:
             return None  # already running
     log_file = open(LOG_FILES[name], "w")
-    env = {**os.environ, "GATEWAY_URL": os.environ.get("GATEWAY_URL", "http://gateway:3000")}
+    env = {
+        **os.environ,
+        "GATEWAY_URL": os.environ.get("GATEWAY_URL", "http://gateway:3000"),
+    }
     proc = subprocess.Popen(
         ["bash", SCRIPTS[name]],
         cwd="/rover",
@@ -100,6 +103,7 @@ def get_map():
         )
     if job["status"] == "running":
         import json
+
         return Response(
             content=json.dumps({"status": "running", "started_at": job["started_at"]}),
             status_code=202,
@@ -107,8 +111,11 @@ def get_map():
         )
     if job["status"] == "error":
         import json
+
         return Response(
-            content=json.dumps({"status": "error", "error": job["stderr"] or "unknown error"}),
+            content=json.dumps(
+                {"status": "error", "error": job["stderr"] or "unknown error"}
+            ),
             status_code=500,
             media_type="application/json",
         )
@@ -153,6 +160,7 @@ def get_report():
         )
     if job["status"] == "running":
         import json
+
         return Response(
             content=json.dumps({"status": "running", "started_at": job["started_at"]}),
             status_code=202,
@@ -160,8 +168,11 @@ def get_report():
         )
     if job["status"] == "error":
         import json
+
         return Response(
-            content=json.dumps({"status": "error", "error": job["stderr"] or "unknown error"}),
+            content=json.dumps(
+                {"status": "error", "error": job["stderr"] or "unknown error"}
+            ),
             status_code=500,
             media_type="application/json",
         )

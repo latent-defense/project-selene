@@ -9,5 +9,6 @@
 #
 # Analyze the map and produce a Markdown report on your findings.
 
-echo "TODO: implement your reporting agent"
-exit 1
+set -euo pipefail
+
+python /rover/agent/reporting_agent.py
