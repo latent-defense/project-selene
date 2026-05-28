@@ -14,3 +14,5 @@ read output
 ```
 docker compose exec rover sh -lc 'python -m json.tool /rover/output/map.json'
 ```
+
+lets re-work this to use explicit state management instead of a messy single-thread history

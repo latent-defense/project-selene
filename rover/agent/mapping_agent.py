@@ -11,7 +11,7 @@ from urllib.parse import urlparse, urlunparse
 import httpx
 from anthropic import Anthropic, NotFoundError
 
-SYSTEM_PROMPT_PATH = Path("/rover/agent/system_prompt.md")
+SYSTEM_PROMPT_PATH = Path("/rover/agent/mapping_system_prompt.md")
 OUTPUT_PATH = Path("/rover/output/map.json")
 DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 MODEL_FALLBACKS = (
@@ -477,104 +477,6 @@ def build_supply_graph(observations: list[dict[str, Any]]) -> list[dict[str, Any
     return edges
 
 
-def build_consistency_checks(
-    dependency_graph: list[dict[str, Any]],
-    supply_graph: list[dict[str, Any]],
-    discovered_pods: set[str],
-    fetched_endpoints_by_pod: dict[str, set[str]],
-) -> dict[str, Any]:
-    """Compare graph signals and endpoint coverage for report readiness."""
-    dependency_by_pair: dict[tuple[str, str], list[dict[str, Any]]] = {}
-    supply_by_pair: dict[tuple[str, str], list[dict[str, Any]]] = {}
-
-    for edge in dependency_graph:
-        pair = (str(edge["from_pod"]), str(edge["to_pod"]))
-        dependency_by_pair.setdefault(pair, []).append(edge)
-    for edge in supply_graph:
-        pair = (str(edge["from_pod"]), str(edge["to_pod"]))
-        supply_by_pair.setdefault(pair, []).append(edge)
-
-    missing_supply_links: list[dict[str, Any]] = []
-    resource_mismatch_links: list[dict[str, Any]] = []
-    for dep in dependency_graph:
-        dependent = str(dep["from_pod"])
-        supplier = str(dep["to_pod"])
-        reciprocal_pair = (supplier, dependent)
-        reciprocal_supplies = supply_by_pair.get(reciprocal_pair, [])
-        if not reciprocal_supplies:
-            missing_supply_links.append(
-                {
-                    "dependent_pod": dependent,
-                    "supplier_pod": supplier,
-                    "resource": dep.get("resource"),
-                    "criticality": dep.get("criticality"),
-                }
-            )
-            continue
-        dep_resource = dep.get("resource")
-        if dep_resource is None:
-            continue
-        reciprocal_resources = {supply.get("resource") for supply in reciprocal_supplies}
-        if dep_resource not in reciprocal_resources:
-            resource_mismatch_links.append(
-                {
-                    "dependent_pod": dependent,
-                    "supplier_pod": supplier,
-                    "dependency_resource": dep_resource,
-                    "supplier_resources": sorted(str(r) for r in reciprocal_resources if r is not None),
-                }
-            )
-
-    undocumented_dependency_links: list[dict[str, Any]] = []
-    for supply in supply_graph:
-        supplier = str(supply["from_pod"])
-        consumer = str(supply["to_pod"])
-        reciprocal_pair = (consumer, supplier)
-        reciprocal_dependencies = dependency_by_pair.get(reciprocal_pair, [])
-        if not reciprocal_dependencies:
-            undocumented_dependency_links.append(
-                {
-                    "supplier_pod": supplier,
-                    "consumer_pod": consumer,
-                    "resource": supply.get("resource"),
-                }
-            )
-
-    unknown_pod_references: list[dict[str, Any]] = []
-    for edge in dependency_graph + supply_graph:
-        from_pod = str(edge["from_pod"])
-        to_pod = str(edge["to_pod"])
-        if from_pod not in discovered_pods:
-            unknown_pod_references.append({"pod_id": from_pod, "referenced_by": "from_pod"})
-        if to_pod not in discovered_pods:
-            unknown_pod_references.append({"pod_id": to_pod, "referenced_by": "to_pod"})
-
-    endpoint_coverage_gaps: list[dict[str, Any]] = []
-    required = set(REQUIRED_POD_ENDPOINTS)
-    for pod in sorted(discovered_pods):
-        covered = fetched_endpoints_by_pod.get(pod, set())
-        missing = sorted(required - covered)
-        if missing:
-            endpoint_coverage_gaps.append({"pod_id": pod, "missing_endpoints": missing})
-
-    return {
-        "summary": {
-            "dependency_edge_count": len(dependency_graph),
-            "supply_edge_count": len(supply_graph),
-            "missing_supply_link_count": len(missing_supply_links),
-            "undocumented_dependency_link_count": len(undocumented_dependency_links),
-            "resource_mismatch_count": len(resource_mismatch_links),
-            "unknown_pod_reference_count": len(unknown_pod_references),
-            "endpoint_coverage_gap_count": len(endpoint_coverage_gaps),
-        },
-        "missing_supply_links": missing_supply_links,
-        "undocumented_dependency_links": undocumented_dependency_links,
-        "resource_mismatch_links": resource_mismatch_links,
-        "unknown_pod_references": unknown_pod_references,
-        "endpoint_coverage_gaps": endpoint_coverage_gaps,
-    }
-
-
 def build_memory_summary(
     visited_urls: set[str], observations: list[dict[str, Any]]
 ) -> dict[str, Any]:
@@ -890,12 +792,6 @@ def run_mapping() -> dict[str, Any]:
     finished_at = utc_now_iso()
     dependency_graph = build_dependency_graph(observations)
     supply_graph = build_supply_graph(observations)
-    consistency_checks = build_consistency_checks(
-        dependency_graph=dependency_graph,
-        supply_graph=supply_graph,
-        discovered_pods=discovered_pods,
-        fetched_endpoints_by_pod=fetched_endpoints_by_pod,
-    )
     artifact = {
         "metadata": {
             "started_at": started_at,
@@ -916,7 +812,6 @@ def run_mapping() -> dict[str, Any]:
         },
         "observations": observations,
         "assistant_trace": assistant_trace,
-        "consistency_checks": consistency_checks,
         "placeholders": {
             "pods": sorted(discovered_pods),
             "dependency_graph": dependency_graph,
