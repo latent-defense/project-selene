@@ -26,7 +26,14 @@ MAX_CONTEXT_BODY_PREVIEW_CHARS = 1200
 DEFAULT_CONTEXT_WINDOW_TURNS = 4
 DISCOVERY_PORT_START = 3001
 DISCOVERY_PORT_END = 3012
-REQUIRED_POD_ENDPOINTS = ("/info", "/status", "/dependencies", "/supplies", "/logs", "/comms")
+REQUIRED_POD_ENDPOINTS = (
+    "/info",
+    "/status",
+    "/dependencies",
+    "/supplies",
+    "/logs",
+    "/comms",
+)
 LEARNED_PORT_BY_POD: dict[str, int] = {}
 
 
@@ -117,7 +124,10 @@ def learn_pod_port_mapping_from_json(payload: Any, source_url: str) -> None:
                 parsed_localhost = urlparse(localhost_url)
                 localhost_host = (parsed_localhost.hostname or "").lower()
                 localhost_port = parsed_localhost.port
-                if localhost_host in {"localhost", "127.0.0.1"} and localhost_port is not None:
+                if (
+                    localhost_host in {"localhost", "127.0.0.1"}
+                    and localhost_port is not None
+                ):
                     LEARNED_PORT_BY_POD[pod.lower()] = localhost_port
 
             pod_id = node.get("id")
@@ -190,7 +200,14 @@ def normalize_fetch_url(args: dict[str, str]) -> dict[str, Any]:
             auth = f"{auth}:{parsed.password}"
         netloc = f"{auth}@{resolved_netloc}"
     resolved_url = urlunparse(
-        (parsed.scheme, netloc, parsed.path, parsed.params, parsed.query, parsed.fragment)
+        (
+            parsed.scheme,
+            netloc,
+            parsed.path,
+            parsed.params,
+            parsed.query,
+            parsed.fragment,
+        )
     )
     return {
         "requested_url": requested_url,
@@ -199,7 +216,9 @@ def normalize_fetch_url(args: dict[str, str]) -> dict[str, Any]:
     }
 
 
-def normalize_fetch_observation(args: dict[str, Any], response: httpx.Response) -> dict[str, Any]:
+def normalize_fetch_observation(
+    args: dict[str, Any], response: httpx.Response
+) -> dict[str, Any]:
     text_body = response.text
     register_pod_port_from_url(args["resolved_url"])
     parsed_json = maybe_parse_json(text_body)
@@ -244,7 +263,14 @@ def rebuild_url_with_port(url: str, port: int) -> str:
             auth = f"{auth}:{parsed.password}"
         netloc = f"{auth}@{netloc}"
     return urlunparse(
-        (parsed.scheme, netloc, parsed.path, parsed.params, parsed.query, parsed.fragment)
+        (
+            parsed.scheme,
+            netloc,
+            parsed.path,
+            parsed.params,
+            parsed.query,
+            parsed.fragment,
+        )
     )
 
 
@@ -252,7 +278,11 @@ def run_fetch_tool(args: dict[str, Any], timeout_seconds: float) -> dict[str, An
     """Run the fetch_url tool and normalize output for the model and map artifact."""
     requested_url = str(args.get("url", "")).strip()
     if not requested_url:
-        return {"tool": "fetch_url", "error": "Missing required 'url' parameter", "args": args}
+        return {
+            "tool": "fetch_url",
+            "error": "Missing required 'url' parameter",
+            "args": args,
+        }
 
     url_details = normalize_fetch_url({"requested_url": requested_url})
     resolved_url = str(url_details["resolved_url"])
@@ -265,19 +295,23 @@ def run_fetch_tool(args: dict[str, Any], timeout_seconds: float) -> dict[str, An
                 parsed_resolved = urlparse(resolved_url)
                 resolved_host = (parsed_resolved.hostname or "").lower()
                 discovered_port: int | None = None
-                if resolved_host and resolved_host not in {"localhost", "127.0.0.1", "gateway"}:
+                if resolved_host and resolved_host not in {
+                    "localhost",
+                    "127.0.0.1",
+                    "gateway",
+                }:
                     discovered_port = discover_port_for_pod(resolved_host, client)
                 if discovered_port is None:
                     raise exc
 
                 resolved_url = rebuild_url_with_port(resolved_url, discovered_port)
                 existing_note = url_details.get("normalization_note")
-                discovery_note = (
-                    f"auto-discovered {resolved_host} port {discovered_port} after connection error"
-                )
+                discovery_note = f"auto-discovered {resolved_host} port {discovered_port} after connection error"
                 url_details["resolved_url"] = resolved_url
                 url_details["normalization_note"] = (
-                    f"{existing_note}; {discovery_note}" if existing_note else discovery_note
+                    f"{existing_note}; {discovery_note}"
+                    if existing_note
+                    else discovery_note
                 )
                 response = client.get(resolved_url)
         return normalize_fetch_observation(url_details, response)
@@ -527,7 +561,7 @@ def build_messages_for_model(
     context_window_turns: int,
 ) -> list[dict[str, Any]]:
     """Compose bounded conversation context with rolling history."""
-    bounded_history = turn_history[-(context_window_turns * 2):]
+    bounded_history = turn_history[-(context_window_turns * 2) :]
     memory_message = {
         "role": "user",
         "content": (
@@ -668,10 +702,7 @@ def run_mapping() -> dict[str, Any]:
 
         assistant_message: dict[str, Any] = {
             "role": "assistant",
-            "content": [
-                block.model_dump()
-                for block in response.content
-            ],
+            "content": [block.model_dump() for block in response.content],
         }
         turn_history.append(assistant_message)
         print(
@@ -687,7 +718,9 @@ def run_mapping() -> dict[str, Any]:
         if assistant_text:
             assistant_trace.append(assistant_text)
 
-        tool_use_blocks = [block for block in response.content if block.type == "tool_use"]
+        tool_use_blocks = [
+            block for block in response.content if block.type == "tool_use"
+        ]
         if not tool_use_blocks:
             if "action: complete" in assistant_text.lower():
                 completion_reason = "model_declared_complete"
@@ -710,7 +743,9 @@ def run_mapping() -> dict[str, Any]:
                     "error": f"Unsupported tool '{block.name}'",
                 }
             else:
-                result_payload = run_fetch_tool(block.input, config.fetch_timeout_seconds)
+                result_payload = run_fetch_tool(
+                    block.input, config.fetch_timeout_seconds
+                )
                 url = result_payload.get("url")
                 if isinstance(url, str) and url:
                     visited_urls.add(url)
@@ -738,7 +773,9 @@ def run_mapping() -> dict[str, Any]:
                 {
                     "type": "tool_result",
                     "tool_use_id": block.id,
-                    "content": json.dumps(compact_observation_for_context(result_payload)),
+                    "content": json.dumps(
+                        compact_observation_for_context(result_payload)
+                    ),
                 }
             )
 
@@ -781,12 +818,17 @@ def run_mapping() -> dict[str, Any]:
 
         if is_crawl_complete(discovered_pods, fetched_endpoints_by_pod):
             completion_reason = "auto_crawl_complete"
-            print("[mapping] Auto crawl reached full discovered coverage.", file=sys.stderr)
+            print(
+                "[mapping] Auto crawl reached full discovered coverage.",
+                file=sys.stderr,
+            )
             break
 
         if "action: complete" in assistant_text.lower():
             completion_reason = "model_declared_complete"
-            print("[mapping] Model declared complete in assistant text.", file=sys.stderr)
+            print(
+                "[mapping] Model declared complete in assistant text.", file=sys.stderr
+            )
             break
 
     finished_at = utc_now_iso()

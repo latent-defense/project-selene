@@ -19,7 +19,14 @@ MODEL_FALLBACKS = (
     "claude-sonnet-4-6",
     "claude-opus-4-7",
 )
-REQUIRED_POD_ENDPOINTS = ("/info", "/status", "/dependencies", "/supplies", "/logs", "/comms")
+REQUIRED_POD_ENDPOINTS = (
+    "/info",
+    "/status",
+    "/dependencies",
+    "/supplies",
+    "/logs",
+    "/comms",
+)
 CRITICALITY_WEIGHT = {"high": 3, "medium": 2, "low": 1}
 
 
@@ -35,7 +42,9 @@ def utc_now_iso() -> str:
 
 def load_system_prompt() -> str:
     if not SYSTEM_PROMPT_PATH.exists():
-        raise FileNotFoundError(f"Reporting system prompt file not found: {SYSTEM_PROMPT_PATH}")
+        raise FileNotFoundError(
+            f"Reporting system prompt file not found: {SYSTEM_PROMPT_PATH}"
+        )
     return SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
 
 
@@ -51,7 +60,9 @@ def load_map_artifact() -> dict[str, Any]:
 
 
 def build_report_config() -> ReportConfig:
-    model = os.getenv("ANTHROPIC_REPORT_MODEL", os.getenv("ANTHROPIC_MODEL", DEFAULT_MODEL))
+    model = os.getenv(
+        "ANTHROPIC_REPORT_MODEL", os.getenv("ANTHROPIC_MODEL", DEFAULT_MODEL)
+    )
     max_tokens = int(os.getenv("REPORT_MAX_TOKENS", "2000"))
     return ReportConfig(model=model, max_tokens=max_tokens)
 
@@ -96,7 +107,9 @@ def create_message_with_fallback(
                 messages=[{"role": "user", "content": user_content}],
             )
             text = "\n".join(
-                block.text for block in response.content if getattr(block, "type", None) == "text"
+                block.text
+                for block in response.content
+                if getattr(block, "type", None) == "text"
             ).strip()
             return text, model
         except NotFoundError as exc:
@@ -155,7 +168,9 @@ def extract_discovered_pods(args: dict[str, Any]) -> set[str]:
     return pods
 
 
-def compute_endpoint_coverage(observations: list[dict[str, Any]]) -> dict[str, set[str]]:
+def compute_endpoint_coverage(
+    observations: list[dict[str, Any]]
+) -> dict[str, set[str]]:
     coverage: dict[str, set[str]] = defaultdict(set)
     for observation in observations:
         url = observation.get("resolved_url") or observation.get("url")
@@ -204,7 +219,9 @@ def build_consistency_checks(
                     "dependent_pod": dep["from_pod"],
                     "supplier_pod": dep["to_pod"],
                     "dependency_resource": dep_resource,
-                    "supplier_resources": sorted(str(r) for r in reciprocal_resources if r is not None),
+                    "supplier_resources": sorted(
+                        str(r) for r in reciprocal_resources if r is not None
+                    ),
                 }
             )
 
@@ -223,9 +240,13 @@ def build_consistency_checks(
     unknown_pod_references: list[dict[str, Any]] = []
     for edge in dependency_graph + supply_graph:
         if edge["from_pod"] not in discovered_pods:
-            unknown_pod_references.append({"pod_id": edge["from_pod"], "referenced_by": "from_pod"})
+            unknown_pod_references.append(
+                {"pod_id": edge["from_pod"], "referenced_by": "from_pod"}
+            )
         if edge["to_pod"] not in discovered_pods:
-            unknown_pod_references.append({"pod_id": edge["to_pod"], "referenced_by": "to_pod"})
+            unknown_pod_references.append(
+                {"pod_id": edge["to_pod"], "referenced_by": "to_pod"}
+            )
 
     endpoint_coverage_gaps: list[dict[str, Any]] = []
     required = set(REQUIRED_POD_ENDPOINTS)
@@ -427,14 +448,28 @@ def build_deterministic_markdown(
         lines.append(
             f"- `{item['pod_id']}` has in-degree `{item['in_degree']}` and weighted in-degree `{item['weighted_in_degree']}`."
         )
-        lines.append(evidence_line("weighted_in_degree", item["pod_id"], "/dependencies", "dependency_graph"))
+        lines.append(
+            evidence_line(
+                "weighted_in_degree",
+                item["pod_id"],
+                "/dependencies",
+                "dependency_graph",
+            )
+        )
     lines.append("")
     lines.append("#### Failure Impact")
     for impact in impacts:
         lines.append(
             f"- If `{impact['pod_id']}` fails: immediate dependents `{impact['immediate_count']}`, transitive impact `{impact['transitive_count']}`."
         )
-        lines.append(evidence_line("failure_impact_transitive_count", impact["pod_id"], "/dependencies", "dependency_graph"))
+        lines.append(
+            evidence_line(
+                "failure_impact_transitive_count",
+                impact["pod_id"],
+                "/dependencies",
+                "dependency_graph",
+            )
+        )
     lines.append("")
     lines.append("#### Hidden Single Points of Failure")
     if spofs:
@@ -442,17 +477,30 @@ def build_deterministic_markdown(
             lines.append(
                 f"- `{spof['pod_id']}` behaves as a potential SPOF with transitive impact `{spof['transitive_count']}`."
             )
-            lines.append(evidence_line("hidden_spof_transitive_threshold", spof["pod_id"], "/dependencies", "risk_metrics"))
+            lines.append(
+                evidence_line(
+                    "hidden_spof_transitive_threshold",
+                    spof["pod_id"],
+                    "/dependencies",
+                    "risk_metrics",
+                )
+            )
     else:
         lines.append("- No strong SPOF threshold exceeded in deterministic checks.")
-        lines.append(evidence_line("hidden_spof_transitive_threshold", "none", "n/a", "risk_metrics"))
+        lines.append(
+            evidence_line(
+                "hidden_spof_transitive_threshold", "none", "n/a", "risk_metrics"
+            )
+        )
     lines.append("")
     lines.append("#### Supply vs Dependency Consistency")
     summary = consistency_checks["summary"]
     lines.append(
         f"- Missing reciprocal supply links: `{summary['missing_supply_link_count']}`; undocumented dependency links: `{summary['undocumented_dependency_link_count']}`; resource mismatches: `{summary['resource_mismatch_count']}`."
     )
-    lines.append(evidence_line("consistency_summary", "multi", "n/a", "consistency_checks"))
+    lines.append(
+        evidence_line("consistency_summary", "multi", "n/a", "consistency_checks")
+    )
     lines.append("")
     lines.append("#### Infrastructure Evolution (Logs + Comms)")
     if timeline:
@@ -461,7 +509,14 @@ def build_deterministic_markdown(
             lines.append(
                 f"- `{event['timestamp']}` `{event['pod_id']}` `{event['event']}`: {event['detail']}"
             )
-            lines.append(evidence_line("timeline_event", event["pod_id"], event["endpoint"] or "n/a", "timeline"))
+            lines.append(
+                evidence_line(
+                    "timeline_event",
+                    event["pod_id"],
+                    event["endpoint"] or "n/a",
+                    "timeline",
+                )
+            )
     else:
         lines.append("- Insufficient data to build timeline events.")
         lines.append(evidence_line("timeline_event_count", "none", "n/a", "timeline"))
@@ -499,9 +554,13 @@ def synthesize_llm_section(
             return "LLM synthesis produced no text.", model_used
         # Deterministic citation pipeline: strip any accidental citation lines.
         sanitized_lines = [
-            line for line in text.splitlines() if not line.strip().startswith("Evidence:")
+            line
+            for line in text.splitlines()
+            if not line.strip().startswith("Evidence:")
         ]
-        sanitized_text = "\n".join(sanitized_lines).strip() or "LLM synthesis produced no narrative."
+        sanitized_text = (
+            "\n".join(sanitized_lines).strip() or "LLM synthesis produced no narrative."
+        )
         return sanitized_text, model_used
     except Exception as exc:
         return f"LLM synthesis unavailable: {type(exc).__name__}: {exc}", "error"
@@ -534,7 +593,9 @@ def main() -> None:
     observations = map_artifact.get("observations", [])
     crawl_summary = map_artifact.get("crawl_summary", {})
 
-    dependency_graph = normalize_dependency_graph(placeholders.get("dependency_graph", []))
+    dependency_graph = normalize_dependency_graph(
+        placeholders.get("dependency_graph", [])
+    )
     supply_graph = normalize_supply_graph(placeholders.get("supply_graph", []))
     discovered_pods = extract_discovered_pods(
         {"crawl_summary": crawl_summary, "placeholders": placeholders}
