@@ -7,3 +7,7 @@ solutions/
 node_modules/
 *.log
 .DS_Store
+__pycache__/
+
+# not getting my keys!
+.env

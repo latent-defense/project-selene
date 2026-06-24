@@ -1,5 +1,33 @@
 # Rover — Agent Scaffold
 
+> **Submission — Kojin Glick (`kojin-glick-report` branch).** This branch implements the
+> mapping + reporting agents and adds an analysis write-up and a companion dashboard.
+>
+> - **Write-up:** [`../KOJIN_WRITE_UP.md`](../KOJIN_WRITE_UP.md) — start here. The current
+>   argument is that Selene is doubly centralized: destructive criticality is concentrated
+>   in the `aquifer-helios-terminus` material core, while constructive response is routed
+>   through Artemis. Buffers are treated as countdown timers, not redundancy.
+> - **Agent code:** [`agent/`](agent/) — `discovery` → `mapping` → `engine` (deterministic
+>   topology, cascade, reconciliation, buffer, and coordination analysis) → `tools`
+>   (progressive disclosure) → `llm` → `reporting`. Entrypoints:
+>   [`run_mapping.sh`](run_mapping.sh), [`run_reporting.sh`](run_reporting.sh).
+> - **Produced outputs:** [`../outputs/map.json`](../outputs/map.json),
+>   [`../outputs/report.md`](../outputs/report.md).
+> - **Dashboard (separate, read-only, does not touch this stack):**
+>   https://github.com/moonstripe/selene-colony-monitor — live rover monitor, material /
+>   cascade / coordination graph views, deterministic topology brief, failure injection,
+>   rendered report, and an agentic chat that streams the rover tool loop.
+>
+> **Run:**
+> ```bash
+> LLM_API_KEY=sk-ant-... docker compose up --build -d
+> curl -X POST localhost:8080/map     && curl localhost:8080/get-map      # poll to 200
+> curl -X POST localhost:8080/report  && curl localhost:8080/get-report   # poll to 200
+> ```
+> The agent is provider-agnostic — an `sk-...` OpenAI key works too.
+
+---
+
 The rover is a Docker container that runs on the colony network alongside the habitat pods. It provides an HTTP interface for triggering your agent and retrieving results.
 
 ## Quick Start
