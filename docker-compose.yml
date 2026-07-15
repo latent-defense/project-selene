@@ -155,6 +155,7 @@ services:
       - rover-output:/rover/output
     environment:
       - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_TAG=${LLM_TAG:-}
       - GATEWAY_URL=http://gateway:3000
     networks:
       - selene-net

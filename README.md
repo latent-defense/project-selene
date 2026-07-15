@@ -4,6 +4,17 @@ A take-home engineering exercise that evaluates systems thinking. You'll build a
 
 This is intentionally open-ended. There is no spec for "done." We're interested in the choices you make, not just the code you write.
 
+## Submission — Anuraag Polisetty
+
+| Artifact | Link |
+|---|---|
+| Writeup (architecture & design decisions) | [WRITEUP.md](WRITEUP.md) |
+| Agent code | [rover/agent/](rover/agent/) |
+| Generated map | [rover/output/map.json](rover/output/map.json) |
+| Final report | [rover/output/report.md](rover/output/report.md) |
+
+Run the mapping and reporting phases with [rover/run_mapping.sh](rover/run_mapping.sh) and [rover/run_reporting.sh](rover/run_reporting.sh).
+
 ## Prerequisites
 
 - **Docker** (with `docker compose`) — the entire colony runs as containers

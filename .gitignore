@@ -5,5 +5,7 @@ docs/
 scripts/
 solutions/
 node_modules/
+.obsidian/
+.vscode/
 *.log
 .DS_Store
